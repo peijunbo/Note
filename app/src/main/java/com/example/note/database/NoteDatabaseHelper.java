@@ -14,6 +14,11 @@ public class NoteDatabaseHelper extends SQLiteOpenHelper {
             + "title text, "
             + "content text, "
             + "date integer)";
+    private static final String CREATE_TODO_LIST = "create table todolist ("
+            + "id integer primary key autoincrement, "
+            + "deadline integer, "
+            + "content text, "
+            + "status integer )";
     public NoteDatabaseHelper(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
     }
@@ -21,7 +26,8 @@ public class NoteDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(CREATE_NOTE_DATABASE);
-        Log.i(TAG, "notes table is created successfully");
+        sqLiteDatabase.execSQL(CREATE_TODO_LIST);
+        Log.i(TAG, "table is created successfully");
     }
 
     @Override

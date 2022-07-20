@@ -13,7 +13,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,9 +32,8 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.note.MainActivity;
 import com.example.note.R;
-import com.example.note.database.TodoDatabaseManager;
+import com.example.note.database.NoteDatabaseManager;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -47,7 +45,7 @@ public class TodolistFragment extends Fragment {
     public static final int SORT_BY_ID = 0;
     public static final int SORT_BY_DEADLINE = 1;
     private int sortMethod = SORT_BY_ID;
-    private TodoDatabaseManager dataBaseManager;
+    private NoteDatabaseManager dataBaseManager;
     private TextView todoDate;
     private TextView todoTime;
     private RecyclerView recyclerView;
@@ -70,12 +68,15 @@ public class TodolistFragment extends Fragment {
         this.sortMethod = sortMethod;
         updateRecyclerView();
     }
+    public TodolistFragment(NoteDatabaseManager databaseManager) {
+        this.dataBaseManager = databaseManager;
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.todolist_mainlayout, container, false);
 
-        dataBaseManager = new TodoDatabaseManager(getContext(), MainActivity.DATABASE_NAME, null, 1);
+
         getListenersReady();
         getViewsReady();
         getButtonsReady();

@@ -95,6 +95,10 @@ public class NotesFragment extends Fragment {
         }
     });
 
+    public NotesFragment(NoteDatabaseManager databaseManager) {
+        this.databaseManager = databaseManager;
+    }
+
     private ImageSpan getImageSpan(Bitmap bitmap) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
@@ -157,8 +161,6 @@ public class NotesFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.note_mainlayout, container, false);
-        databaseManager = new NoteDatabaseManager(requireContext(), DATABASE_NAME, null, 1);
-
         editNoteText = root.findViewById(R.id.edit_note_text);
 
         selectImageBtn = root.findViewById(R.id.select_image);

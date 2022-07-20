@@ -13,9 +13,12 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 
+import com.example.note.database.NoteDatabaseManager;
 import com.example.note.note.NotesFragment;
 import com.example.note.todolist.TodolistFragment;
 
@@ -28,16 +31,21 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager2 viewPager;
     private Fragment pageNote;
     private TodolistFragment pageTodolist;
+    public NoteDatabaseManager databaseManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         checkPermission();
         setToolBar();
+
+        databaseManager = new NoteDatabaseManager(this, DATABASE_NAME, null, 1);
+
         viewPager = findViewById(R.id.view_pager);
         List<Fragment> pageList = new ArrayList<Fragment>();
-        pageTodolist = new TodolistFragment();
-        pageNote = new NotesFragment();
+        pageTodolist = new TodolistFragment(databaseManager);
+        pageNote = new NotesFragment(databaseManager);
         pageList.add(pageNote);
         pageList.add(pageTodolist);
         MyPagerAdapter adapter = new MyPagerAdapter(getSupportFragmentManager(), getLifecycle(), pageList);
@@ -56,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setToolBar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+//        setSupportActionBar(toolbar);
         ImageButton settingBtn;
         settingBtn = findViewById(R.id.setting_button);
         settingBtn.setOnClickListener(new View.OnClickListener() {
