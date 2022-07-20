@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:paddingHorizontal="8dp"
+    android:paddingVertical="16dp">
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="horizontal">
+
+        <EditText android:id="@+id/todo_edit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="top"
+            android:maxHeight="200dp"
+            android:hint="请输入待办内容"/>
+    </LinearLayout>
+    <RelativeLayout
+        android:layout_marginTop="4dp"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/todo_edit_date"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:clickable="true"
+            android:gravity="center"
+            android:background="@drawable/gray_bottom_rounded"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:paddingHorizontal="4dp"
+            android:paddingVertical="2dp"
+            android:layout_alignParentStart="true"
+            android:textSize="16sp"
+            android:text="日期"/>
+        <TextView
+            android:id="@+id/todo_edit_time"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:clickable="true"
+            android:gravity="center"
+            android:background="@drawable/gray_bottom_rounded"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:paddingHorizontal="4dp"
+            android:paddingVertical="2dp"
+            android:layout_toEndOf="@id/todo_edit_date"
+            android:textSize="16sp"
+            android:text="时间"/>
+        <Button
+            android:id="@+id/todo_edit_cancel"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:background="@drawable/gray_border_rounded_hollow"
+            android:layout_marginEnd="8dp"
+            android:layout_toStartOf="@id/todo_edit_done"
+            android:text="取消"
+            android:gravity="center" />
+        <Button
+            android:id="@+id/todo_edit_done"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="完成"
+            android:gravity="center"
+            android:background="@drawable/gray_border_rounded_hollow"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="8dp" />
+    </RelativeLayout>
+</LinearLayout>
