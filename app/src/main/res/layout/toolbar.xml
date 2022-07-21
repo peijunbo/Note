@@ -2,28 +2,21 @@
 <androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/gray_main_background"
     android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
     <RelativeLayout
         android:layout_height="match_parent"
         android:layout_width="match_parent" >
-        <TextView
+        <TextView android:id="@+id/title"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:text="笔记 | 待办"
-            android:gravity="center"
+            android:layout_gravity="center"
             android:textSize="30sp"
             android:textColor="@color/black"
             android:textFontWeight="400"/>
-        <ImageButton android:id="@+id/setting_button"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="24dp"
-            android:layout_alignParentEnd="true"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:background="@drawable/settings_icon"
-            android:text="设置" />
     </RelativeLayout>
 </androidx.appcompat.widget.Toolbar>

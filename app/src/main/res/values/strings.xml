@@ -3,4 +3,6 @@
     <string name="cross">\u2718</string>
     <string name="tick">\u2714</string>
     <string name="plus_bold">\u271A</string>
+    <string name="pages_fragment">笔记 | 待办</string>
+    <string name="note_content_fragment">笔记</string>
 </resources>

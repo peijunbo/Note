@@ -13,6 +13,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,18 +67,24 @@ public class TodolistFragment extends Fragment {
     //按下监听实现动态效果
     private TodoListAdapter.onItemTouchListener onItemTouchListener;
     private AnimatorSet animatorSet;
-    public void sort(int sortMethod) {
+    public void setSortMethod(int sortMethod) {
         this.sortMethod = sortMethod;
         updateRecyclerView();
     }
     public TodolistFragment(NoteDatabaseManager databaseManager) {
         this.dataBaseManager = databaseManager;
     }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.todolist_mainlayout, container, false);
-
 
         getListenersReady();
         getViewsReady();
@@ -85,10 +94,29 @@ public class TodolistFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.setting_menu, menu);
+        menu.findItem(R.id.option_create_time).setChecked(true);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem menuItem) {
+        int id = menuItem.getItemId();
+        if (sortMethod != TodolistFragment.SORT_BY_ID && id == R.id.option_create_time) {
+            sortMethod = TodolistFragment.SORT_BY_ID;
+            menuItem.setChecked(true);
+            setSortMethod(sortMethod);
+        }
+        else if (sortMethod != TodolistFragment.SORT_BY_DEADLINE && id == R.id.option_deadline) {
+            sortMethod = TodolistFragment.SORT_BY_DEADLINE;
+            menuItem.setChecked(true);
+            setSortMethod(sortMethod);
+        }
+
+
+        return false;
+    }
 
     private void getViewsReady() {
         //编辑界面
