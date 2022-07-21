@@ -14,7 +14,7 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:text="笔记 | 待办"
-            android:layout_gravity="center"
+            android:layout_alignParentBottom="true"
             android:textSize="30sp"
             android:textColor="@color/black"
             android:textFontWeight="400"/>

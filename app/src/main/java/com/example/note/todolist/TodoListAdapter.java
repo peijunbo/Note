@@ -152,6 +152,7 @@ public class TodoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
+
     @Override
     public int getItemCount() {
         return (unfinishedTodoList.size() + finishedTodoList.size());
