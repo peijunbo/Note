@@ -22,12 +22,18 @@ import java.util.List;
 public class NotesGridAdapter extends RecyclerView.Adapter<NotesGridAdapter.NoteHolder> {
     private List<Note> notes;
     private Context context;
-
+    private onItemClickListener onItemClickListener;
     public NotesGridAdapter(Context context, List<Note> notes) {
         this.context = context;
         this.notes = notes;
     }
 
+    public interface onItemClickListener {
+        public void onItemClick(NoteHolder holder);
+    }
+    public void setOnItemClickListener(onItemClickListener listener) {
+        onItemClickListener = listener;
+    }
     @NonNull
     @Override
     public NoteHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -41,12 +47,11 @@ public class NotesGridAdapter extends RecyclerView.Adapter<NotesGridAdapter.Note
         holder.title.setText(note.getTitle());
         holder.content.setText(note.getContent());
         holder.date.setText(Utils.getTimeStringFromStamp(note.getDate()));
+        holder.id = notes.get(position).getId();
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context, NoteContentActivity.class);
-                Bundle bundle = ActivityOptions.makeSceneTransitionAnimation((Activity) context, view, "note_content").toBundle();
-                context.startActivity(intent, bundle);
+                onItemClickListener.onItemClick(holder);
             }
         });
     }
@@ -65,6 +70,7 @@ public class NotesGridAdapter extends RecyclerView.Adapter<NotesGridAdapter.Note
         public TextView title;
         public TextView content;
         public TextView date;
+        public int id;
         public NoteHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.preview_note_title);
@@ -72,4 +78,22 @@ public class NotesGridAdapter extends RecyclerView.Adapter<NotesGridAdapter.Note
             date = itemView.findViewById(R.id.preview_note_date);
         }
     }
+
+    public void changeItemById(boolean isNew, Note note) {
+        if (!isNew) {
+            // TODO: 2022/7/22 id的处理
+            for (int i = 0; i < notes.size(); i++) {
+                if (notes.get(i).getId() == note.getId()) {
+                    notes.set(i, note);
+                    notifyItemChanged(i);
+                    return;
+                }
+            }
+        }
+        else {
+            notes.add(0, note);
+            notifyItemInserted(0);
+        }
+    }
+
 }

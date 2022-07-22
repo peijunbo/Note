@@ -1,5 +1,7 @@
 package com.example.note.note;
 
+import com.example.note.Utils;
+
 import java.util.Calendar;
 
 public class Note {
@@ -17,6 +19,13 @@ public class Note {
         this.title = title;
         this.content = content;
         this.date = date;
+        this.id = id;
+    }
+
+    public Note(String title, String content, String date, int id) {
+        this.title = title;
+        this.content = content;
+        this.date = Utils.getTimeStampFromString(date);
         this.id = id;
     }
 

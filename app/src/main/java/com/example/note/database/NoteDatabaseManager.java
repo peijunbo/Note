@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -17,15 +19,22 @@ import java.util.List;
 public class NoteDatabaseManager {
     private NoteDatabaseHelper dbHelper;
     private SQLiteDatabase database;
+    private Context context;
     private static final String TABLE_NOTES = "notes";
     private static final String TABLE_TODOLIST = "todolist";
     public NoteDatabaseManager(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
         dbHelper = new NoteDatabaseHelper(context, name, factory, version);
         database = dbHelper.getWritableDatabase();
+        this.context = context;
     }
 
-    public void addNote(Note note) {
+    public int addNote(Note note) {
         database.insert(TABLE_NOTES, null, getValuesFromNote(note));
+        Cursor cursor = database.rawQuery("select * from sqlite_sequence where name='notes'", null);
+        cursor.moveToFirst();
+        int id = cursor.getInt(cursor.getColumnIndexOrThrow("seq"));
+        cursor.close();
+        return id;
     }
 
     public void deleteNoteById(int id) {
@@ -69,8 +78,13 @@ public class NoteDatabaseManager {
     }
 
 
-    public void addTodo(Todo todo) {
+    public int addTodo(Todo todo) {
         database.insert(TABLE_TODOLIST, null, getValueFromTodo(todo));
+        Cursor cursor = database.rawQuery("select * from sqlite_sequence where name='todolist'", null);
+        cursor.moveToFirst();
+        int id = cursor.getInt(cursor.getColumnIndexOrThrow("seq"));
+        cursor.close();
+        return id;
     }
 
     public void deleteTodoById(int id) {

@@ -7,11 +7,5 @@
     <fragment android:id="@+id/pages_fragment"
         android:name="com.example.note.PagesFragment"
         tools:layout="@layout/pages_fragment">
-        <action android:id="@+id/open_note_content_fragment"
-            app:destination="@id/note_content_fragment" />
-    </fragment>
-    <fragment android:id="@+id/note_content_fragment"
-        android:name="com.example.note.note.NoteContentFragment"
-        tools:layout="@layout/note_content_fragment">
     </fragment>
 </navigation>

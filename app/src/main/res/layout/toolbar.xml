@@ -4,19 +4,15 @@
     android:layout_height="?attr/actionBarSize"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/gray_main_background"
-    android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
-    <RelativeLayout
-        android:layout_height="match_parent"
-        android:layout_width="match_parent" >
-        <TextView android:id="@+id/title"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:text="笔记 | 待办"
-            android:layout_alignParentBottom="true"
-            android:textSize="30sp"
-            android:textColor="@color/black"
-            android:textFontWeight="400"/>
-    </RelativeLayout>
+    android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+    app:contentInsetStart="0dp"
+    app:contentInsetEnd="0dp">
+    <TextView android:id="@+id/title"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:layout_centerInParent="true"
+        android:textSize="30sp"
+        android:textColor="@color/black"
+        android:textFontWeight="400"/>
 </androidx.appcompat.widget.Toolbar>

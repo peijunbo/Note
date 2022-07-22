@@ -37,6 +37,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.note.R;
 import com.example.note.database.NoteDatabaseManager;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -53,7 +54,6 @@ public class TodolistFragment extends Fragment {
     private TextView todoTime;
     private RecyclerView recyclerView;
     private EditText editTodoText;
-    private Button editTodoOpenBtn;
     private Button editTodoDoneBtn;
     private Button editTodoCancelBtn;
     private Button deleteTodoBtn;
@@ -86,9 +86,9 @@ public class TodolistFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.todolist_mainlayout, container, false);
 
-        getListenersReady();
-        getViewsReady();
-        getButtonsReady();
+        initListeners();
+        initViews();
+        initButtons();
         updateRecyclerView();
         return root;
     }
@@ -118,7 +118,7 @@ public class TodolistFragment extends Fragment {
         return false;
     }
 
-    private void getViewsReady() {
+    private void initViews() {
         //编辑界面
         editTodoView = LayoutInflater.from(getContext()).inflate(R.layout.edit_todo_layout, null, false);
         editTodoWindow = new PopupWindow(getContext());
@@ -188,19 +188,7 @@ public class TodolistFragment extends Fragment {
         recyclerView = (RecyclerView) root.findViewById(R.id.todolist);
     }
 
-    private void getButtonsReady() {
-        //打开待办输入界面
-        editTodoOpenBtn = (Button) root.findViewById(R.id.button_add_todo);
-
-        editTodoOpenBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setEditNoteBtn(null);
-                resetEditLayout();
-                openEditNoteWindow();
-            }
-        });
-
+    private void initButtons() {
         //完成待办编辑
         editTodoDoneBtn = (Button) editTodoView.findViewById(R.id.todo_edit_done);
 
@@ -217,7 +205,18 @@ public class TodolistFragment extends Fragment {
         });
     }
 
-    private void getListenersReady() {
+    public void setAddTodoBtn(FloatingActionButton button) {
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setEditNoteBtn(null);
+                resetEditLayout();
+                openEditNoteWindow();
+            }
+        });
+    }
+
+    private void initListeners() {
 
         onStatusClickListener = new TodoListAdapter.onStatusClickListener() {
             @Override
@@ -378,6 +377,8 @@ public class TodolistFragment extends Fragment {
             });
         }
     }
+
+
     //针对不同情况修改删除界面按钮
     private void setDeleteNoteBtn(TodoListAdapter.UnfinishedTodoHolder holder) {
         deleteTodoBtn.setOnClickListener(new View.OnClickListener() {
