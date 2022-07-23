@@ -1,8 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/save_note"
-        android:icon="@drawable/save"
-        app:showAsAction="always"
+    <item android:id="@+id/text_options"
+        android:icon="@drawable/text_icon"
+        android:title=""
+        app:showAsAction="ifRoom">
+        <menu>
+            <item android:id="@+id/set_bold"
+                android:icon="@drawable/bold_icon"
+                android:title=""/>
+            <item android:id="@+id/set_italic"
+                android:icon="@drawable/italic_icon"
+                android:title="" />
+            <item android:id="@+id/set_underline"
+                android:icon="@drawable/underline_icon"
+                android:title="" />
+        </menu>
+    </item>
+
+    <item android:id="@+id/add_image"
+        android:icon="@drawable/image_icon"
+        app:showAsAction="ifRoom"
         android:title="" />
+
+    <item android:id="@+id/save_note"
+        android:icon="@drawable/save_icon"
+        app:showAsAction="ifRoom"
+        android:title="" />
+
 </menu>

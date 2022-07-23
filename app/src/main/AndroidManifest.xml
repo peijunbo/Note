@@ -23,6 +23,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".note.NoteContentActivity"
+            android:parentActivityName=".MainActivity"
             android:exported="false" />
     </application>
 

@@ -81,7 +81,6 @@ public class NotesGridAdapter extends RecyclerView.Adapter<NotesGridAdapter.Note
 
     public void changeItemById(boolean isNew, Note note) {
         if (!isNew) {
-            // TODO: 2022/7/22 id的处理
             for (int i = 0; i < notes.size(); i++) {
                 if (notes.get(i).getId() == note.getId()) {
                     notes.set(i, note);

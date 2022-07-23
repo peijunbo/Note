@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -12,15 +12,14 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"/>
     <EditText android:id="@+id/note_title"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
         android:hint="标题"
         android:textSize="24sp"
         android:textStyle="bold"/>
     <EditText android:id="@+id/note_content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="8"
+        android:layout_weight="1"
         android:background="@drawable/gray_border_rounded_hollow"
         android:gravity="start|top"
         android:hint="内容" />

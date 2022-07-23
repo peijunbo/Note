@@ -11,8 +11,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
     <com.google.android.material.floatingactionbutton.FloatingActionButton android:id="@+id/floating_button"
-        android:transitionName="note_content"
-        android:layout_width="wrap_content"
+            android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/add"
         app:maxImageSize="56dp"

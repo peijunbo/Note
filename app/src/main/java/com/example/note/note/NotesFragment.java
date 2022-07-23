@@ -56,6 +56,7 @@ public class NotesFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // TODO: 2022/7/23 删除note 
         openNoteLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
             @Override
             public void onActivityResult(ActivityResult result) {
@@ -65,7 +66,6 @@ public class NotesFragment extends Fragment {
                         intent.getLongExtra("date", 0),
                         intent.getIntExtra("id", NULL_NOTE_ID));
                 Log.d(TAG, "note获取的为" + intent.getStringExtra("content"));
-                // TODO: 2022/7/22 id的处理 
                 if (note.getId() != NULL_NOTE_ID) {
                     adapter.changeItemById(intent.getBooleanExtra("isNew", false), note);
                 }
@@ -77,17 +77,6 @@ public class NotesFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.notes_mainlayout, container, false);
-
-//        //设置recyclerView内容
-//        List<Note> notes = new ArrayList<>();
-//        for (int i = 1; i < 40; i++) {
-//            if (i % 10 == 0) {
-//                notes.add(new Note("标题" + i, "超长内容\n超长内容\n超长内容\n超长内容\n啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦\n啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦" + i, i, i));
-//            }
-//            Note note = new Note("标题" + i, "内容" + i, i, i);
-//            notes.add(note);
-//            Log.i(TAG, "标题" + i + "的id为" + databaseManager.addNote(note));
-//        }
         recyclerView = root.findViewById(R.id.notes);
         adapter = new NotesGridAdapter(requireContext(), databaseManager.getNotes());
         StaggeredGridLayoutManager manager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
@@ -123,44 +112,44 @@ public class NotesFragment extends Fragment {
 //        getImageLauncher.launch("image/*");
 //    }
     private ImageSpan getImageSpan(String imageName) {
-    FileInputStream fileInputStream = null;
-    try {
-        fileInputStream = requireContext().openFileInput(imageName);
-    } catch (FileNotFoundException e) {
-        Log.e(TAG, "imageNotFound");
-        return null;
+        FileInputStream fileInputStream = null;
+        try {
+            fileInputStream = requireContext().openFileInput(imageName);
+        } catch (FileNotFoundException e) {
+            Log.e(TAG, "imageNotFound");
+            return null;
+        }
+        if (fileInputStream == null) {
+            return null;
+        }
+        Bitmap bitmap = BitmapFactory.decodeStream(fileInputStream);
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        int maxWidth = 400;
+        int maxHeight = 400;
+        Bitmap result;
+        if (width > maxWidth) {
+            float scaleW = (float) maxWidth / width;
+            Matrix matrix = new Matrix();
+            matrix.postScale(scaleW, scaleW);
+            result = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+        }
+        else if (height > maxHeight) {
+            float scaleH = (float) maxHeight / height;
+            Matrix matrix = new Matrix();
+            matrix.postScale(scaleH, scaleH);
+            result = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+        }
+        else {
+            result = bitmap;
+        }
+        return new ImageSpan(requireContext(), result, ImageSpan.ALIGN_BASELINE);
     }
-    if (fileInputStream == null) {
-        return null;
-    }
-    Bitmap bitmap = BitmapFactory.decodeStream(fileInputStream);
-    int width = bitmap.getWidth();
-    int height = bitmap.getHeight();
-    int maxWidth = 400;
-    int maxHeight = 400;
-    Bitmap result;
-    if (width > maxWidth) {
-        float scaleW = (float) maxWidth / width;
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleW, scaleW);
-        result = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
-    }
-    else if (height > maxHeight) {
-        float scaleH = (float) maxHeight / height;
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleH, scaleH);
-        result = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
-    }
-    else {
-        result = bitmap;
-    }
-    return new ImageSpan(requireContext(), result, ImageSpan.ALIGN_BASELINE);
-}
 
     private SpannableString getSpannableString(String str) {
         SpannableString result = new SpannableString(str);
-        Pattern imPattern = Pattern.compile("\\[image[0-9]*]");
-        Matcher matcher = imPattern.matcher(str);
+        Pattern imgPattern = Pattern.compile("\\[image[0-9]*]");
+        Matcher matcher = imgPattern.matcher(str);
         while (matcher.find()) {
             ImageSpan imageSpan = getImageSpan(str.substring(matcher.start() + 1, matcher.end() - 1));//+1-1去掉括号
             result.setSpan(imageSpan, matcher.start(), matcher.end(), SpannableString.SPAN_INCLUSIVE_EXCLUSIVE);

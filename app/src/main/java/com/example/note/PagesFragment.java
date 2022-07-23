@@ -1,8 +1,10 @@
 package com.example.note;
 
 import android.os.Bundle;
+import android.text.Html;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,6 +62,7 @@ public class PagesFragment extends Fragment {
                     noteTitle.setSpan(colorSpan, 5, 7, SpannableString.SPAN_INCLUSIVE_EXCLUSIVE);
                     TextView title = requireActivity().findViewById(R.id.title);
                     title.setText(noteTitle);
+                    Log.d(TAG, Html.toHtml(noteTitle, Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE));
                 }
                 else {
                     pageTodolist.setAddTodoBtn(button);

@@ -137,6 +137,7 @@ public class TodolistFragment extends Fragment {
         deleteTodoWindow.setWidth(WindowManager.LayoutParams.MATCH_PARENT);
         deleteTodoWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
         deleteTodoWindow.setFocusable(true);
+        deleteTodoWindow.setAnimationStyle(R.style.PopupWindow);
         deleteTodoWindow.setBackgroundDrawable(AppCompatResources.getDrawable(getContext() , R.drawable.edit_todo_window));
 
         //日期时间设置
