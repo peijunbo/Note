@@ -16,9 +16,17 @@
         <item name="overlapAnchor">false</item>
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeBackground">@color/gray_main_background</item>
+        <item name="actionModeCloseDrawable">@mipmap/close_icon</item>
     </style>
     <style name="PopupWindow">
         <item name="android:windowEnterAnimation">@anim/fade_in</item>
         <item name="android:windowExitAnimation">@anim/fade_out</item>
+    </style>
+    <style name="CheckBox" parent="Theme.AppCompat.Light">
+        <item name="colorControlActivated">@color/yellow</item>
+        <item name="android:colorControlActivated">@color/yellow</item>
     </style>
 </resources>

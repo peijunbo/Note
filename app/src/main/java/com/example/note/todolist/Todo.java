@@ -1,7 +1,7 @@
 package com.example.note.todolist;
 
 public class Todo {
-    private int id;
+    public int id;
     private String content;
     private String deadline;
     private boolean isFinished;

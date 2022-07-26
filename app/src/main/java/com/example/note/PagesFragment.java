@@ -5,6 +5,7 @@ import android.text.Html;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,8 +46,8 @@ public class PagesFragment extends Fragment {
         button = root.findViewById(R.id.floating_button);
 
         List<Fragment> pageList = new ArrayList<>();
-        pageTodolist = new TodolistFragment(databaseManager);
-        pageNote = new NotesFragment(databaseManager);
+        pageTodolist = new TodolistFragment(databaseManager, viewPager);
+        pageNote = new NotesFragment(databaseManager, viewPager);
         pageList.add(pageNote);
         pageList.add(pageTodolist);
         MyPagerAdapter adapter = new MyPagerAdapter(requireActivity().getSupportFragmentManager(), getLifecycle(), pageList);
@@ -74,5 +75,4 @@ public class PagesFragment extends Fragment {
         });
         return root;
     }
-
 }

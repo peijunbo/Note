@@ -96,22 +96,10 @@ public class NoteDatabaseManager {
     }
 
 
-    public List<Todo> getTodoList(int sortMethod) {
+    public List<Todo> getTodoList() {
         List<Todo> todoList = new ArrayList<Todo>();
         Cursor cursor;
-        switch (sortMethod) {
-            case 0:
-                //创建时间排序
-                cursor = database.rawQuery("select * from todolist order by status asc, id desc", null);
-                break;
-            case 1:
-                //截止时间排序
-                cursor = database.rawQuery("select * from todolist order by status asc, deadline asc", null);
-                break;
-            default:
-                cursor = database.rawQuery("select * from todolist order by id asc", null);
-                break;
-        }
+        cursor = database.rawQuery("select * from todolist", null);
         //读取
         String deadline;
         long deadline_num;

@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.ActionMode;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,6 +35,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SortedList;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.note.R;
 import com.example.note.database.NoteDatabaseManager;
@@ -49,19 +52,53 @@ public class TodolistFragment extends Fragment {
     public static final int SORT_BY_ID = 0;
     public static final int SORT_BY_DEADLINE = 1;
     private int sortMethod = SORT_BY_ID;
-    private NoteDatabaseManager dataBaseManager;
+    private NoteDatabaseManager databaseManager;
+    private ViewPager2 parent;
     private TextView todoDate;
     private TextView todoTime;
     private RecyclerView recyclerView;
+    private TodoListAdapter todoListAdapter;
+    private TodoSortListCallback todoSortListCallback;
     private EditText editTodoText;
     private Button editTodoDoneBtn;
     private Button editTodoCancelBtn;
     private Button deleteTodoBtn;
-    private ImageButton settingBtn;
     private View editTodoView;
     private View deleteTodoView;
     private PopupWindow editTodoWindow;
     private PopupWindow deleteTodoWindow;
+    //多选删除
+    private ActionMode deleteActionMode;
+    private ActionMode.Callback deleteCallback = new ActionMode.Callback() {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            // TODO: 2022/7/25 更换关闭图标 
+            requireActivity().getMenuInflater().inflate(R.menu.delete_select_menu, menu);
+            parent.setUserInputEnabled(false);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            deleteTodoWindow.showAtLocation(root, Gravity.BOTTOM, 0, 0);
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            if (item.getItemId() == R.id.select_all) {
+                todoListAdapter.selectAll();
+            }
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            deleteTodoWindow.dismiss();
+            todoListAdapter.endSelect();
+            parent.setUserInputEnabled(true);
+        }
+    };
     //改变Note状态的监听
     private TodoListAdapter.onStatusClickListener onStatusClickListener;
     //按下监听实现动态效果
@@ -69,10 +106,14 @@ public class TodolistFragment extends Fragment {
     private AnimatorSet animatorSet;
     public void setSortMethod(int sortMethod) {
         this.sortMethod = sortMethod;
-        updateRecyclerView();
+        initRecyclerView();
     }
     public TodolistFragment(NoteDatabaseManager databaseManager) {
-        this.dataBaseManager = databaseManager;
+        this.databaseManager = databaseManager;
+    }
+    public TodolistFragment(NoteDatabaseManager databaseManager, ViewPager2 viewPager2) {
+        this.databaseManager = databaseManager;
+        parent = viewPager2;
     }
 
     @Override
@@ -80,7 +121,6 @@ public class TodolistFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -89,7 +129,7 @@ public class TodolistFragment extends Fragment {
         initListeners();
         initViews();
         initButtons();
-        updateRecyclerView();
+        initRecyclerView();
         return root;
     }
 
@@ -113,8 +153,6 @@ public class TodolistFragment extends Fragment {
             menuItem.setChecked(true);
             setSortMethod(sortMethod);
         }
-
-
         return false;
     }
 
@@ -136,7 +174,13 @@ public class TodolistFragment extends Fragment {
         deleteTodoWindow.setContentView(deleteTodoView);
         deleteTodoWindow.setWidth(WindowManager.LayoutParams.MATCH_PARENT);
         deleteTodoWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
-        deleteTodoWindow.setFocusable(true);
+
+        deleteTodoWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                deleteActionMode.finish();
+            }
+        });
         deleteTodoWindow.setAnimationStyle(R.style.PopupWindow);
         deleteTodoWindow.setBackgroundDrawable(AppCompatResources.getDrawable(getContext() , R.drawable.edit_todo_window));
 
@@ -195,13 +239,20 @@ public class TodolistFragment extends Fragment {
 
         //删除待办
         deleteTodoBtn = (Button) deleteTodoView.findViewById(R.id.delete_todo_item);
-
+        deleteTodoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                todoListAdapter.deleteSelectedTodo();
+                //后续界面变化
+                deleteActionMode.finish();
+            }
+        });
         //取消待办输入
         editTodoCancelBtn = (Button) editTodoView.findViewById(R.id.todo_edit_cancel);
         editTodoCancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                closeEditNoteWindow();
+                closeEditTodoWindow();
             }
         });
     }
@@ -221,11 +272,11 @@ public class TodolistFragment extends Fragment {
 
         onStatusClickListener = new TodoListAdapter.onStatusClickListener() {
             @Override
-            public void onStatusClick(TodoListAdapter.UnfinishedTodoHolder holder) {
+            public void onStatusClick(TodoListAdapter.TodoViewHolder holder) {
                 Todo todo = holder.getSingleNote();
                 todo.changeStatus();
-                dataBaseManager.updateTodoById(holder.getId(), todo);
-                updateRecyclerView();
+                todoListAdapter.updateTodo(todo);
+//                updateRecyclerView();
             }
         };
         animatorSet = new AnimatorSet();
@@ -233,7 +284,7 @@ public class TodolistFragment extends Fragment {
         //按下动态效果
         onItemTouchListener = new TodoListAdapter.onItemTouchListener() {
             @Override
-            public void onItemTouch(MotionEvent motionEvent, TodoListAdapter.UnfinishedTodoHolder holder) {
+            public void onItemTouch(MotionEvent motionEvent, TodoListAdapter.TodoViewHolder holder) {
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         animatorSet = new AnimatorSet();
@@ -283,8 +334,9 @@ public class TodolistFragment extends Fragment {
                         }
                         else {
                             //完成播放，打开删除界面
-                            setDeleteNoteBtn(holder);
-                            openDeleteNoteWindow();
+//                            setDeleteNoteBtn(holder);
+
+                            openDeleteNoteWindow(holder);
                             //播放结束动画
                             AnimatorSet animSet = new AnimatorSet();
                             ObjectAnimator resetX1 = ObjectAnimator.ofFloat(holder.itemView, "scaleX", 1.05f, 1.01f);
@@ -331,17 +383,22 @@ public class TodolistFragment extends Fragment {
     }
 
     //待办列表
-    private void updateRecyclerView() {
-        TodoListAdapter adapter = new TodoListAdapter(getContext(), dataBaseManager.getTodoList(sortMethod));
-        adapter.setonStatusClickListener(onStatusClickListener);
-        adapter.setOnItemTouchListener(onItemTouchListener);
-        recyclerView.setAdapter(adapter);
+    private void initRecyclerView() {
+        todoListAdapter = new TodoListAdapter(requireContext(), databaseManager);
+        todoSortListCallback = new TodoSortListCallback(todoListAdapter);
+        todoSortListCallback.setSortMethod(sortMethod);
+        SortedList<Todo> sortedList = new SortedList<>(Todo.class, todoSortListCallback);
+        sortedList.addAll(databaseManager.getTodoList());
+        todoListAdapter.setTodoList(sortedList);
+        todoListAdapter.setonStatusClickListener(onStatusClickListener);
+        todoListAdapter.setOnItemTouchListener(onItemTouchListener);
+        recyclerView.setAdapter(todoListAdapter);
     }
 
 
 
     //针对不同情况修改编辑界面按钮事件
-    private void setEditNoteBtn(TodoListAdapter.UnfinishedTodoHolder holder) {
+    private void setEditNoteBtn(TodoListAdapter.TodoViewHolder holder) {
         if (holder != null) {
             editTodoDoneBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -349,16 +406,13 @@ public class TodolistFragment extends Fragment {
 
                     String deadline = todoDate.getText().toString() + " " + todoTime.getText().toString();
                     String content = editTodoText.getText().toString();
-                    int id = holder.getId();
                     Todo todo = holder.getSingleNote();
                     todo.changeContent(content);
                     todo.changeDeadline(deadline);
-                    dataBaseManager.updateTodoById(id, todo);
-
+                    todoListAdapter.updateTodo(todo);
                     //后续界面变化
-                    closeEditNoteWindow();
-                    updateRecyclerView();
-
+                    closeEditTodoWindow();
+//                    updateRecyclerView();
                 }
             });
         }
@@ -369,11 +423,11 @@ public class TodolistFragment extends Fragment {
                     String deadline = todoDate.getText() + " " + todoTime.getText();
                     String content = editTodoText.getText().toString();
                     Todo todo = new Todo(content, deadline, false);
-                    dataBaseManager.addTodo(todo);
-
+                    todo.id =   databaseManager.addTodo(todo);
+                    todoListAdapter.addTodo(todo);
                     //后续界面变化
-                    closeEditNoteWindow();
-                    updateRecyclerView();
+                    closeEditTodoWindow();
+//                    updateRecyclerView();
                 }
             });
         }
@@ -381,17 +435,18 @@ public class TodolistFragment extends Fragment {
 
 
     //针对不同情况修改删除界面按钮
-    private void setDeleteNoteBtn(TodoListAdapter.UnfinishedTodoHolder holder) {
-        deleteTodoBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dataBaseManager.deleteTodoById(holder.getId());
-                //后续界面变化
-                closeDeleteNoteWindow(holder);
-                updateRecyclerView();
-            }
-        });
-    }
+//    private void setDeleteNoteBtn(TodoListAdapter.TodoViewHolder holder) {
+//        deleteTodoBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                databaseManager.deleteTodoById(holder.getId());
+//                todoListAdapter.deleteTodoById(holder.getId());
+//                //后续界面变化
+//                closeDeleteNoteWindow(holder);
+////                updateRecyclerView();
+//            }
+//        });
+//    }
     public void checkInput() {
         String date = todoDate.getText().toString();
         String time = todoTime.getText().toString();
@@ -412,26 +467,30 @@ public class TodolistFragment extends Fragment {
         editTodoText.setText("");
     }
 
-    private void closeEditNoteWindow() {
+    private void closeEditTodoWindow() {
         editTodoWindow.dismiss();
         resetEditLayout();
         editTodoText.clearFocus();
     }
-    private void closeDeleteNoteWindow() {
-        deleteTodoWindow.dismiss();
-    }
-    private void closeDeleteNoteWindow(TodoListAdapter.UnfinishedTodoHolder holder) {
-        holder.itemView.setBackgroundResource(R.drawable.todo_item_background);
-        deleteTodoWindow.dismiss();
-    }
+
+
+//    private void closeDeleteNoteWindow(TodoListAdapter.TodoViewHolder holder) {
+//        holder.itemView.setBackgroundResource(R.drawable.todo_item_background);
+//        deleteActionMode.finish();
+//        todoListAdapter.deleteSelectedTodo();
+//        todoListAdapter.endSelect();
+//    }
+
     private void openEditNoteWindow() {
 
         checkInput();
         editTodoWindow.showAtLocation(root, Gravity.BOTTOM, 0, 0);
         editTodoText.requestFocus();
     }
-    private void openDeleteNoteWindow() {
-        deleteTodoWindow.showAtLocation(root, Gravity.BOTTOM, 0, 0);
+
+    private void openDeleteNoteWindow(TodoListAdapter.TodoViewHolder holder) {
+        deleteActionMode = requireActivity().startActionMode(deleteCallback);
+        todoListAdapter.startSelect(holder);
     }
 
     private void openSoftInput(View view) {

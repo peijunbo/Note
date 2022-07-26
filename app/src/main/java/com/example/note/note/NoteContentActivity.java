@@ -25,6 +25,7 @@ import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,8 +37,11 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.RotateAnimation;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultCallback;
@@ -52,6 +56,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.view.MenuItemCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.note.MainActivity;
 import com.example.note.R;
@@ -74,14 +80,21 @@ public class NoteContentActivity extends AppCompatActivity {
     private static final String DATABASE_NAME = "NOTE.db";
     private static final int NEW_NOTE_ID = -1;
     private NoteDatabaseManager databaseManager;
-    private ActivityResultLauncher<String> getImageLauncher;
-    private PopupWindow editOptions;
     private EditText noteContent;
     private EditText noteTitle;
     private Toolbar toolbar;
     private int id;
     private long date;
+    private String content;
+    private String title;
     private boolean isNew = false;
+    //编辑功能弹窗
+    private View editorMenu;
+    private View.OnClickListener listener1;
+    private View.OnClickListener listener2;
+    //获取外部图片
+    private ActivityResultLauncher<String> getImageLauncher;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -93,9 +106,9 @@ public class NoteContentActivity extends AppCompatActivity {
 
         databaseManager = new NoteDatabaseManager(this, DATABASE_NAME, null, 1);
         init();
-        initSoftInputListener();
         setGetImageLauncher();
-
+        initEditorMenu();
+        initSoftInputListener();
     }
 
     @Override
@@ -119,91 +132,15 @@ public class NoteContentActivity extends AppCompatActivity {
         else if (id == R.id.add_image) {
             getImageLauncher.launch("image/*");
         }
-        else if (id == R.id.text_options) {
-            item.setIcon(R.drawable.text_icon);
-            View view = findViewById(R.id.text_options);
-            AnimatorSet scaleSet = new AnimatorSet();
-            AnimatorSet animatorSet = new AnimatorSet();
-            ObjectAnimator scale = ObjectAnimator.ofFloat(view, "scaleX", 1, 1);
-            scale.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    item.setIcon(R.drawable.close_icon);
-                }
-            });
-            ObjectAnimator scale2 = ObjectAnimator.ofFloat(view, "scaleX", 1, 1);
-            ObjectAnimator rotation = ObjectAnimator.ofFloat(view, "rotation", 0, 540);
-            scale.setDuration(350);
-            scale2.setDuration(150);
-            rotation.setDuration(500);
-            scaleSet.play(scale).after(scale2);
-            animatorSet.play(rotation).with(scaleSet);
-            animatorSet.start();
-        }
-        else if (id == R.id.set_bold) {
-            StyleSpan span = new StyleSpan(Typeface.BOLD);
-            noteContent.getEditableText().setSpan(span, noteContent.getSelectionStart(), noteContent.getSelectionEnd(), SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
-        }
-        else if (id == R.id.set_underline) {
-            UnderlineSpan span = new UnderlineSpan();
-            noteContent.getEditableText().setSpan(span, noteContent.getSelectionStart(), noteContent.getSelectionEnd(),SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
-        }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onBackPressed() {
+        saveNote();
         setResult(RESULT_OK, getResult());
         super.onBackPressed();
     }
-
-
-//    private void setGetImageLauncher() {
-//        getImageLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(),
-//                new ActivityResultCallback<Uri>() {
-//            @Override
-//            public void onActivityResult(Uri result) {
-//                if (result != null) {
-//                    InputStream inputStream = null;
-//                    FileOutputStream fileOutputStream = null;
-//                    String imageName = "image" + System.currentTimeMillis();
-//                    try {
-//                        inputStream = NoteContentActivity.this
-//                                .getContentResolver()
-//                                .openInputStream(result);
-//
-//                        fileOutputStream = NoteContentActivity.this
-//                                .openFileOutput(imageName, Context.MODE_PRIVATE);
-//                        byte[] buffer = new byte[4096];
-//                        int redCount;
-//                        while ((redCount = inputStream.read(buffer)) >= 0) {
-//                            fileOutputStream.write(buffer, 0, redCount);
-//                        }
-//                    } catch (FileNotFoundException e) {
-//                        Log.e(TAG, "ImageNotFound", e);
-//                    } catch (IOException e) {
-//                        Log.e(TAG, "ImageIO", e);
-//                    } finally {
-//                        try {
-//                            if (inputStream != null) {
-//                                inputStream.close();
-//                            }
-//                            if (fileOutputStream != null) {
-//                                fileOutputStream.flush();
-//                                fileOutputStream.getFD().sync();
-//                                fileOutputStream.close();
-//                            }
-//                        } catch (IOException e) {
-//                            Log.e(TAG, "closeError", e);
-//                        }
-//                    }
-//                    Editable editable =  noteContent.getEditableText();
-//                    editable.insert(noteContent.getSelectionStart(), getSpannableString("[" + imageName + "]"));
-//
-//                }
-//            }
-//        });
-//    }
     private void setGetImageLauncher() {
         getImageLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(),
                 new ActivityResultCallback<Uri>() {
@@ -217,8 +154,10 @@ public class NoteContentActivity extends AppCompatActivity {
                         inputStream = NoteContentActivity.this
                                 .getContentResolver()
                                 .openInputStream(result);
+
                         //打开bitmap
                         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+
                         //缩小bitmap
 
                         int maxWidth = getWindow().getDecorView().getWidth() - 100;
@@ -284,7 +223,6 @@ public class NoteContentActivity extends AppCompatActivity {
         int maxWidth = getWindow().getDecorView().getWidth() - 100;
         int maxHeight = getWindow().getDecorView().getHeight() / 3;
 
-
         //调整大小
         if (bitmap.getWidth() > maxWidth) {
             float scaleW = (float) maxWidth / bitmap.getWidth();
@@ -301,7 +239,7 @@ public class NoteContentActivity extends AppCompatActivity {
 
         Uri uri = Uri.fromFile(getFileStreamPath(imageName));
 
-        return new ImageSpan(this, uri, ImageSpan.ALIGN_BASELINE);
+        return new ImageSpan(this, uri, ImageSpan.ALIGN_BOTTOM);
     }
 
     private SpannableString getSpannableString(String str) {
@@ -321,11 +259,22 @@ public class NoteContentActivity extends AppCompatActivity {
         Intent intent = getIntent();
         id = intent.getIntExtra("id", -2);
         noteContent = findViewById(R.id.note_content);
+        noteContent.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    editorMenu.setVisibility(View.VISIBLE);
+                }
+                else {
+                    editorMenu.setVisibility(View.GONE);
+                    saveNote();
+                }
+            }
+        });
         noteTitle = findViewById(R.id.note_title);
-
-        if (id != -2 && id != NEW_NOTE_ID) {
-            // TODO: 2022/7/23 用fromhtml处理文本
-            Spanned spannableString = Html.fromHtml(intent.getStringExtra("content"), Html.FROM_HTML_MODE_COMPACT, new Html.ImageGetter() {
+        if (id != NEW_NOTE_ID) {
+            content = intent.getStringExtra("content");
+            Spanned spannableString = Html.fromHtml(content, Html.FROM_HTML_MODE_COMPACT, new Html.ImageGetter() {
                 @Override
                 public Drawable getDrawable(String source) {
                     Uri uri = Uri.parse(source);
@@ -337,36 +286,139 @@ public class NoteContentActivity extends AppCompatActivity {
             }, null);
             noteContent.setText(spannableString);
 
-            noteTitle.setText(intent.getStringExtra("title"));
+            title = intent.getStringExtra("title");
+            noteTitle.setText(title);
             date = Utils.getTimeStampFromString(intent.getStringExtra("date"));
         }
+        View space = findViewById(R.id.note_scroll_bottom_space);
+        space.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                noteContent.requestFocus();
+            }
+        });
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
     }
 
-    private void initPopupWindow() {
-        View editOptionsView = LayoutInflater.from(this).inflate(R.layout.edit_note_popup, findViewById(R.id.root_view), false);
-        editOptions = new PopupWindow();
-        editOptions.setContentView(editOptionsView);
-    }
-
-    private void initSoftInputListener() {
-        View root = getWindow().getDecorView();
-        root.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+    private void initEditorMenu() {
+        //弹窗设置
+        editorMenu = findViewById(R.id.note_editor);
+        //编辑选项设置
+        ImageView textStyle = findViewById(R.id.image8);
+        View insertOptions = findViewById(R.id.insert_options);
+        View textEditor = findViewById(R.id.text_editor);
+        RecyclerView recyclerView = findViewById(R.id.editor_options);
+        LinearLayoutManager manager = new LinearLayoutManager(this);
+        manager.setOrientation(RecyclerView.HORIZONTAL);
+        EditorAdapter adapter = new EditorAdapter();
+        adapter.setOnItemClickListener(new EditorAdapter.OnItemClickListener() {
             @Override
-            public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
-                Rect rect = new Rect();
-                root.getWindowVisibleDisplayFrame(rect);
-                int visibleHeight = rect.height();
-                int screenHeight = root.getHeight();
-                if (visibleHeight < screenHeight * 3 / 4) {
+            public EditText getEditText() {
+                return noteContent;
+            }
+        });
+        recyclerView.setLayoutManager(manager);
+        recyclerView.setAdapter(adapter);
+
+        //打开
+        //位移动画
+        ObjectAnimator o1 = ObjectAnimator.ofFloat(insertOptions, "translationX", 0, -1000);
+        ObjectAnimator o2 = ObjectAnimator.ofFloat(textEditor, "translationX", 1000, 0);
+        o1.setDuration(500);
+        o2.setDuration(500);
+        o1.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                insertOptions.setVisibility(View.GONE);
+                textStyle.setOnClickListener(listener2);
+            }
+
+            @Override
+            public void onAnimationStart(Animator animation) {
+                textEditor.setVisibility(View.VISIBLE);
+                textStyle.setOnClickListener(null);
+            }
+        });
+        //修改文字计时
+        ObjectAnimator s1 = ObjectAnimator.ofFloat(textStyle, "scaleX", 1, 1);
+        s1.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                textStyle.setImageResource(R.mipmap.close_icon);
+            }
+        });
+        s1.setDuration(150);
+
+        //旋转动画
+        ObjectAnimator r1 = ObjectAnimator.ofFloat(textStyle, "rotation", 0, 540);
+        r1.setDuration(500);
+
+        AnimatorSet openTextEditor = new AnimatorSet();
+        openTextEditor.play(o1).with(o2).with(s1).with(r1);
+
+        //关闭动画
+        ObjectAnimator c1 = ObjectAnimator.ofFloat(insertOptions, "translationX", -1000, 0);
+        ObjectAnimator c2 = ObjectAnimator.ofFloat(textEditor, "translationX", 0, 1000);
+        c1.setDuration(500);
+        c2.setDuration(500);
+        c1.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                textEditor.setVisibility(View.GONE);
+                textStyle.setOnClickListener(listener1);
+            }
+
+            @Override
+            public void onAnimationStart(Animator animation) {
+                insertOptions.setVisibility(View.VISIBLE);
+                textStyle.setOnClickListener(null);
+            }
+        });
+
+        //修改文字计时
+        ObjectAnimator s2 = ObjectAnimator.ofFloat(textStyle, "scaleX", 1, 1);
+        s2.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                textStyle.setImageResource(R.mipmap.text_icon);
+            }
+        });
+        s2.setDuration(350);
+
+        //旋转动画
+        ObjectAnimator r2 = ObjectAnimator.ofFloat(textStyle, "rotation", 540, 0);
+        r2.setDuration(500);
+        AnimatorSet closeTextEditor = new AnimatorSet();
+        closeTextEditor.play(c1).with(c2).with(s2).with(r2);
+
+        listener1 = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openTextEditor.start();
+            }
+        };
+        listener2 = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                closeTextEditor.start();
+            }
+        };
+        textStyle.setOnClickListener(listener1);
+    }
+    private void initSoftInputListener() {
+
+        ScrollView view = findViewById(R.id.note_scroll);
+        view.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                if (bottom - top < (oldBottom - oldTop) * 2 / 3) {
                     //键盘打开
                 }
-                else {
-                    //键盘收起
-                    saveNote();
-
+                else if (bottom - top > (oldBottom - oldTop) * 3 / 2) {
+                    //键盘关闭
+                    noteContent.clearFocus();
                 }
             }
         });
@@ -375,7 +427,6 @@ public class NoteContentActivity extends AppCompatActivity {
 
     private Intent getResult() {
         Intent intent = new Intent();
-        // TODO: 2022/7/23 将结果用html返回来保存格式
         intent.putExtra("title", noteTitle.getText().toString());
         intent.putExtra("content", Html.toHtml(noteContent.getText(), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE));
         intent.putExtra("date", date);
@@ -385,19 +436,16 @@ public class NoteContentActivity extends AppCompatActivity {
     }
 
     private void saveNote() {
-//        Note note = new Note(noteTitle.getText().toString(), noteContent.getText().toString(), date);
-        Note note = new Note(noteTitle.getText().toString(), Html.toHtml(noteContent.getText(), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE), date);
-        if (id != -1) {//是已经存在的Note
-            databaseManager.updateNoteById(id, note);
-        }
-        else {
-            id = databaseManager.addNote(note);
-            isNew = true;
+        String newContent = Html.toHtml(noteContent.getText(), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
+        String newTitle = noteTitle.getText().toString();
+        if (!newContent.equals(content) || ! newTitle.equals(title) || newContent.isEmpty() || newTitle.isEmpty()) {
+            Note note = new Note(noteTitle.getText().toString(), Html.toHtml(noteContent.getText(), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE), date);
+            if (id != NEW_NOTE_ID) {//是已经存在的Note
+                databaseManager.updateNoteById(id, note);
+            } else {
+                id = databaseManager.addNote(note);
+                isNew = true;
+            }
         }
     }
-
-
-
-
-
 }

@@ -9,18 +9,96 @@
     <androidx.appcompat.widget.Toolbar android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"/>
-    <EditText android:id="@+id/note_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="标题"
-        android:textSize="24sp"
-        android:textStyle="bold"/>
-    <EditText android:id="@+id/note_content"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        android:layout_marginEnd="16dp" />
+
+    <ScrollView android:id="@+id/note_scroll"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@drawable/gray_border_rounded_hollow"
-        android:gravity="start|top"
-        android:hint="内容" />
+        android:fillViewport="true"
+        android:layout_marginBottom="1dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="32dp">
+            <EditText android:id="@+id/note_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:background="@color/white"
+                android:layout_marginBottom="16dp"
+                android:hint="标题" />
+            <EditText android:id="@+id/note_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top|start"
+                android:background="@color/white"
+                android:hint="内容"
+                android:paddingBottom="32dp"/>
+            <Space android:id="@+id/note_scroll_bottom_space"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"/>
+        </LinearLayout>
+    </ScrollView>
+    <LinearLayout android:id="@+id/note_editor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="4dp"
+        android:background="@drawable/note_editor_background"
+        android:visibility="gone">
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
+            android:orientation="horizontal">
+            <LinearLayout android:id="@+id/insert_options"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true">
+                <ImageView android:id="@+id/image1"
+                    android:layout_width="0dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:src="@drawable/image_icon" />
+                <ImageView android:id="@+id/image2"
+                    android:layout_width="0dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:src="@drawable/image_icon" />
+                <ImageView android:id="@+id/image3"
+                    android:layout_width="0dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:src="@drawable/image_icon" />
+                <ImageView android:id="@+id/image4"
+                    android:layout_width="0dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:src="@drawable/image_icon" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/text_editor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:visibility="gone">
+                <androidx.recyclerview.widget.RecyclerView android:id="@+id/editor_options"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
+        </RelativeLayout>
+        <ImageView android:id="@+id/image8"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_weight="1"
+            android:src="@mipmap/text_icon" />
+    </LinearLayout>
 </LinearLayout>

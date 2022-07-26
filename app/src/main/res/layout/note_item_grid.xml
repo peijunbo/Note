@@ -1,35 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:layout_margin="8dp"
-    android:background="@drawable/todo_item_background">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="visible"
+            type="androidx.databinding.ObservableBoolean" />
+        <import type="android.view.View" />
+    </data>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <TextView android:id="@+id/preview_note_title"
+        android:orientation="vertical"
+        android:layout_margin="8dp"
+        android:background="@drawable/todo_item_background">
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-        <TextView android:id="@+id/preview_note_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView android:id="@+id/preview_note_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView android:id="@+id/preview_note_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="4"
+                android:ellipsize="end" />
+        </LinearLayout>
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:maxLines="4"
-            android:ellipsize="end" />
-    </LinearLayout>
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView android:id="@+id/preview_note_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true" />
-        <CheckBox android:id="@+id/check_delete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:visibility="invisible"/>
-    </RelativeLayout>
+            android:layout_height="wrap_content">
+            <TextView android:id="@+id/preview_note_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:layout_alignParentStart="true" />
+            <CheckBox android:id="@+id/delete_note_check"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:visibility="@{visible?View.VISIBLE:View.INVISIBLE}"
+                android:theme="@style/CheckBox"/>
+        </RelativeLayout>
 
-</LinearLayout>
+    </LinearLayout>
+</layout>

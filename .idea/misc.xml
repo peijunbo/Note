@@ -7,11 +7,14 @@
         <entry key="..\:/program/Note/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.161" />
         <entry key="..\:/program/Note/app/src/main/res/drawable-v24/todo_item_background.xml" value="0.185" />
         <entry key="..\:/program/Note/app/src/main/res/drawable/add_button_background.xml" value="0.185" />
+        <entry key="..\:/program/Note/app/src/main/res/drawable/check_box_selector.xml" value="0.161" />
+        <entry key="..\:/program/Note/app/src/main/res/drawable/close_drawable.xml" value="0.161" />
         <entry key="..\:/program/Note/app/src/main/res/drawable/dark_gray_bottom_rounded.xml" value="0.159" />
         <entry key="..\:/program/Note/app/src/main/res/drawable/edit_todo_window.xml" value="0.159" />
         <entry key="..\:/program/Note/app/src/main/res/drawable/gray_border_rounded_hollow.xml" value="0.185" />
         <entry key="..\:/program/Note/app/src/main/res/drawable/gray_bottom_rounded.xml" value="0.185" />
         <entry key="..\:/program/Note/app/src/main/res/drawable/ic_launcher_background.xml" value="0.161" />
+        <entry key="..\:/program/Note/app/src/main/res/drawable/note_editor_background.xml" value="0.161" />
         <entry key="..\:/program/Note/app/src/main/res/drawable/todo_item_background.xml" value="0.185" />
         <entry key="..\:/program/Note/app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/program/Note/app/src/main/res/layout/delete_todo_layout.xml" value="0.3463541666666667" />
@@ -24,11 +27,13 @@
         <entry key="..\:/program/Note/app/src/main/res/layout/note_mainlayout.xml" value="0.3463541666666667" />
         <entry key="..\:/program/Note/app/src/main/res/layout/notes_mainlayout.xml" value="0.1" />
         <entry key="..\:/program/Note/app/src/main/res/layout/pages_fragment.xml" value="0.3453125" />
+        <entry key="..\:/program/Note/app/src/main/res/layout/text_editor_item.xml" value="0.1" />
         <entry key="..\:/program/Note/app/src/main/res/layout/title.xml" value="0.3463541666666667" />
         <entry key="..\:/program/Note/app/src/main/res/layout/title_toolbar.xml" value="0.2713541666666667" />
-        <entry key="..\:/program/Note/app/src/main/res/layout/todo_item.xml" value="0.3453125" />
+        <entry key="..\:/program/Note/app/src/main/res/layout/todo_item.xml" value="0.33" />
         <entry key="..\:/program/Note/app/src/main/res/layout/todolist_mainlayout.xml" value="0.3463541666666667" />
         <entry key="..\:/program/Note/app/src/main/res/layout/toolbar.xml" value="0.2" />
+        <entry key="..\:/program/Note/app/src/main/res/menu/delete_select_menu.xml" value="0.3453125" />
         <entry key="..\:/program/Note/app/src/main/res/menu/note_content_menu.xml" value="0.3453125" />
         <entry key="..\:/program/Note/app/src/main/res/menu/setting_menu.xml" value="0.3463541666666667" />
         <entry key="..\:/program/Note/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.161" />

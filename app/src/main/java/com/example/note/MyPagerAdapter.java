@@ -15,7 +15,6 @@ import java.util.List;
 
 public class MyPagerAdapter extends FragmentStateAdapter {
     private List<Fragment> pageList;
-
     public MyPagerAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle, List<Fragment> pageList) {
         super(fragmentManager, lifecycle);
         this.pageList = pageList;

@@ -2,6 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/option_sort_method"
+        android:icon="@mipmap/settings_icon"
+        app:showAsAction="ifRoom"
         android:title="排序方式">
         <menu>
             <group android:checkableBehavior="single">
